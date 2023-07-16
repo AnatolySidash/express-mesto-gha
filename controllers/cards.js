@@ -1,6 +1,7 @@
 const {
   OK_STATUS_CODE,
   CREATED_STATUS_CODE,
+  BAD_REQUEST_STATUS_CODE,
   SERVER_ERROR_STATUS_CODE,
 } = require('../utils/errors');
 
@@ -23,7 +24,15 @@ module.exports.createCard = (req, res) => {
 
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res.status(CREATED_STATUS_CODE).send({ data: card }))
-    .catch(() => res.status(SERVER_ERROR_STATUS_CODE).send({ message: 'На сервере произошла ошибка' }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(BAD_REQUEST_STATUS_CODE).send({ message: 'Переданы некорректные данные при создании пользователя' });
+      } else {
+        res.status(SERVER_ERROR_STATUS_CODE).send({
+          message: 'На сервере произошла ошибка',
+        });
+      }
+    });
 };
 
 module.exports.likeCard = (req, res) => {

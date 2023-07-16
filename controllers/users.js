@@ -24,10 +24,16 @@ module.exports.getUserById = (req, res) => {
       }
       return res.status(OK_STATUS_CODE).send({ data: user });
     })
-    .catch(() => {
-      res.status(SERVER_ERROR_STATUS_CODE).send({
-        message: 'На сервере произошла ошибка',
-      });
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(BAD_REQUEST_STATUS_CODE).send({
+          message: 'Переданы некорректные данные пользователя',
+        });
+      } else {
+        res.status(SERVER_ERROR_STATUS_CODE).send({
+          message: 'На сервере произошла ошибка',
+        });
+      }
     });
 };
 
