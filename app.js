@@ -15,6 +15,10 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use('*', (req, res) => {
+  res.status(404).json({ message: 'Страница не найдена' });
+});
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/', userRouter);
