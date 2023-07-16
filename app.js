@@ -15,14 +15,14 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('*', (req, res) => {
-  res.status(404).json({ message: 'Страница не найдена' });
-});
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/', userRouter);
 app.use('/', cardRouter);
+
+app.use('*', (req, res) => {
+  res.status(404).json({ message: 'Страница не найдена' });
+});
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
   useNewUrlParser: true,
