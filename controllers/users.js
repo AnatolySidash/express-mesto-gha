@@ -1,11 +1,17 @@
-const { OK_STATUS_CODE, CREATED_STATUS_CODE, BAD_REQUEST_STATUS_CODE, NOT_FOUND_STATUS_CODE, SERVER_ERROR_STATUS_CODE } = require('../utils/errors');
+const {
+  OK_STATUS_CODE,
+  CREATED_STATUS_CODE,
+  BAD_REQUEST_STATUS_CODE,
+  NOT_FOUND_STATUS_CODE,
+  SERVER_ERROR_STATUS_CODE,
+} = require('../utils/errors');
 
 const User = require('../models/user');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
-    .then(user => res.status(OK_STATUS_CODE).send({ data: user }))
-    .catch(err => res.status(SERVER_ERROR_STATUS_CODE).send({ message: 'На сервере произошла ошибка' }));
+    .then((user) => res.status(OK_STATUS_CODE).send({ data: user }))
+    .catch(() => res.status(SERVER_ERROR_STATUS_CODE).send({ message: 'На сервере произошла ошибка' }));
 };
 
 module.exports.getUserById = (req, res) => {
@@ -18,7 +24,7 @@ module.exports.getUserById = (req, res) => {
       }
       return res.status(OK_STATUS_CODE).send({ data: user });
     })
-    .catch((err) => {
+    .catch(() => {
       res.status(SERVER_ERROR_STATUS_CODE).send({
         message: 'На сервере произошла ошибка',
       });
@@ -29,7 +35,7 @@ module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
   User.create({ name, about, avatar })
-    .then(user => res.status(CREATED_STATUS_CODE).send({ data: user }))
+    .then((user) => res.status(CREATED_STATUS_CODE).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(BAD_REQUEST_STATUS_CODE).send({ message: 'Переданы некорректные данные при создании пользователя' });
