@@ -1,13 +1,29 @@
 const bcrypt = require('bcrypt');
+const { generateToken } = require('../utils/token');
+
 const {
   OK_STATUS_CODE,
   CREATED_STATUS_CODE,
   BAD_REQUEST_STATUS_CODE,
+  NOT_AUTHORIZED_REQUEST_STATUS_CODE,
   NOT_FOUND_STATUS_CODE,
   SERVER_ERROR_STATUS_CODE,
 } = require('../utils/errors');
 
 const User = require('../models/user');
+
+module.exports.login = (req, res) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = generateToken({ _id: user._id });
+      res.send({ token });
+    })
+    .catch(() => {
+      res.status(NOT_AUTHORIZED_REQUEST_STATUS_CODE).send({ message: 'Отказ в доступе' });
+    });
+};
 
 module.exports.getUsers = (req, res) => {
   User.find({})
@@ -47,7 +63,7 @@ module.exports.createUser = (req, res) => {
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
-    .then((user) => res.status(CREATED_STATUS_CODE).send({ data: user }))
+    .then((user) => res.status(CREATED_STATUS_CODE).send({ _id: user._id, email: user.email }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(BAD_REQUEST_STATUS_CODE).send({ message: 'Переданы некорректные данные при создании пользователя' });
