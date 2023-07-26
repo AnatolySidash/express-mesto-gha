@@ -17,8 +17,10 @@ module.exports.login = (req, res) => {
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = generateToken({ _id: user._id });
-      res.send({ token });
+      const payload = { _id: user._id };
+      const token = generateToken(payload);
+      res.cookie('jwt', token, { httpOnly: true });
+      return res.status(OK_STATUS_CODE).send({ message: 'Авторизация прошла успешно! Доступ разрешён!' });
     })
     .catch(() => {
       res.status(NOT_AUTHORIZED_REQUEST_STATUS_CODE).send({ message: 'Отказ в доступе' });
@@ -29,6 +31,23 @@ module.exports.getUsers = (req, res) => {
   User.find({})
     .then((user) => res.status(OK_STATUS_CODE).send({ data: user }))
     .catch(() => res.status(SERVER_ERROR_STATUS_CODE).send({ message: 'На сервере произошла ошибка' }));
+};
+
+module.exports.getCurrentUser = (req, res) => {
+  User.findById(req.user._id)
+    .then((user) => {
+      if (!user) {
+        return res.status(NOT_FOUND_STATUS_CODE).send({
+          message: 'Пользователь по указанному id не найден.',
+        });
+      }
+      return res.status(OK_STATUS_CODE).send({ data: user });
+    })
+    .catch(() => {
+      res.status(SERVER_ERROR_STATUS_CODE).send({
+        message: 'На сервере произошла ошибка',
+      });
+    });
 };
 
 module.exports.getUserById = (req, res) => {

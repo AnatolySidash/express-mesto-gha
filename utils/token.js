@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const SECRET_KEY = 'super-secret-key';
 
-function genegateToken(payload) {
+function generateToken(payload) {
   return jwt.sign({ payload }, SECRET_KEY, { expiresIn: '7d' });
 }
 
@@ -12,9 +12,10 @@ function checkToken(token) {
 
   try {
     return jwt.verify(token, SECRET_KEY);
-  } catch {
+  }
+  catch {
     return false;
   }
 };
 
-module.exports = { genegateToken, checkToken };
+module.exports = { generateToken, checkToken };

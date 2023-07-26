@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
+const { auth } = require('./middlewares/auth');
 
 const { login, createUser } = require('./controllers/users');
 
@@ -14,20 +15,13 @@ const app = express();
 
 app.use(helmet());
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '64b2cf128bade16c153b05ec',
-  };
-  next();
-});
-
 app.use(bodyParser.json());
-app.use(cookieParser.json());
+app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use('/', userRouter);
-app.use('/', cardRouter);
-app.post('/users/signin', login);
-app.post('/users/signup', createUser);
+app.use('/users', auth, userRouter);
+app.use('/cards', auth, cardRouter);
+app.post('/signin', login);
+app.post('/signup', createUser);
 
 app.use('*', (req, res) => {
   res.status(404).json({ message: 'Страница не найдена' });
