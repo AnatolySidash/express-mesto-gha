@@ -7,9 +7,9 @@ userRouter.get('/', getUsers);
 
 userRouter.get('/me', getCurrentUser);
 
-userRouter.get('/:id', getUserById);
-
 userRouter.patch('/me', updateUserInfo);
+
+userRouter.get('/:id', getUserById);
 
 userRouter.patch('/me/avatar', changeAvatar);
 

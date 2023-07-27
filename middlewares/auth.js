@@ -3,7 +3,7 @@ const { NOT_AUTHORIZED_REQUEST_STATUS_CODE } = require('../utils/errors');
 
 const auth = (req, res, next) => {
   if (!req.cookies) {
-    res.status(NOT_AUTHORIZED_REQUEST_STATUS_CODE).json({ error: 'Нет доступа' });
+    res.status(NOT_AUTHORIZED_REQUEST_STATUS_CODE).json({ message: 'Нет доступа' });
     return;
   }
 
@@ -12,7 +12,7 @@ const auth = (req, res, next) => {
   const result = checkToken(token);
 
   if (!result) {
-    res.status(NOT_AUTHORIZED_REQUEST_STATUS_CODE).json({ error: 'Нет доступа' });
+    res.status(NOT_AUTHORIZED_REQUEST_STATUS_CODE).json({ message: 'Нет доступа' });
     return;
   }
 
