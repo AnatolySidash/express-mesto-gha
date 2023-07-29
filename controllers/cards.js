@@ -42,10 +42,10 @@ module.exports.deleteCard = (req, res, next) => {
       if (!card) {
         throw new NotFoundError('Карточка по указанному id не найдена.');
       }
-      return res.status(OK_STATUS_CODE).send({ data: card });
+      res.status(OK_STATUS_CODE).send({ data: card });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные карточки'));
       } else {
         res.status(SERVER_ERROR_STATUS_CODE).send({
@@ -62,10 +62,10 @@ module.exports.likeCard = (req, res, next) => {
       if (!card) {
         throw new NotFoundError('Карточка по указанному id не найдена.');
       }
-      return res.status(OK_STATUS_CODE).send({ data: card });
+      res.status(OK_STATUS_CODE).send({ data: card });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные карточки'));
       } else {
         res.status(SERVER_ERROR_STATUS_CODE).send({
@@ -82,10 +82,10 @@ module.exports.dislikeCard = (req, res, next) => {
       if (!card) {
         throw new NotFoundError('Карточка по указанному id не найдена.');
       }
-      return res.status(OK_STATUS_CODE).send({ data: card });
+      res.status(OK_STATUS_CODE).send({ data: card });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные карточки'));
       } else {
         res.status(SERVER_ERROR_STATUS_CODE).send({

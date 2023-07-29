@@ -88,9 +88,13 @@ module.exports.getCurrentUser = (req, res, next) => {
       res.status(OK_STATUS_CODE).send({ data: user });
     })
     .catch((err) => {
-      res.status(SERVER_ERROR_STATUS_CODE).send({
-        message: 'На сервере произошла ошибка',
-      });
+      if (err.name === 'ValidationError') {
+        next(new BadRequestError('Переданы некорректные данные пользователя'));
+      } else {
+        res.status(SERVER_ERROR_STATUS_CODE).send({
+          message: 'На сервере произошла ошибка',
+        });
+      }
       next(err);
     });
 };

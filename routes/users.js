@@ -9,14 +9,14 @@ userRouter.get('/', getUsers);
 
 userRouter.get('/me', getCurrentUser);
 
+userRouter.get('/:id', getUserById);
+
 userRouter.patch('/me', celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
     about: Joi.string().required().min(2).max(30),
   }),
 }), updateUserInfo);
-
-userRouter.get('/:id', getUserById);
 
 userRouter.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
