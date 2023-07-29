@@ -10,6 +10,7 @@ const {
 const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-error');
 const BadRequestError = require('../errors/bad-request-error');
+const NotAuthorizedRequestError = require('../errors/not-authorized-request-error');
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
@@ -22,7 +23,7 @@ module.exports.login = (req, res, next) => {
       return res.status(OK_STATUS_CODE).send({ message: 'Авторизация прошла успешно! Доступ разрешён!' });
     })
     .catch((err) => {
-      next(new BadRequestError('Отказ в доступе'));
+      next(new NotAuthorizedRequestError('Отказ в доступе'));
       next(err);
     });
 };
@@ -39,10 +40,10 @@ module.exports.getUserById = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('Пользователь по указанному id не найден.');
       }
-      return res.status(OK_STATUS_CODE).send({ data: user });
+      res.status(OK_STATUS_CODE).send({ data: user });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные пользователя'));
       } else {
         res.status(SERVER_ERROR_STATUS_CODE).send({
@@ -84,7 +85,7 @@ module.exports.getCurrentUser = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('Пользователь по указанному id не найден.');
       }
-      return res.status(OK_STATUS_CODE).send({ data: user });
+      res.status(OK_STATUS_CODE).send({ data: user });
     })
     .catch((err) => {
       res.status(SERVER_ERROR_STATUS_CODE).send({
@@ -102,7 +103,7 @@ module.exports.updateUserInfo = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('Пользователь по указанному id не найден.');
       }
-      return res.status(OK_STATUS_CODE).send({ data: user });
+      res.status(OK_STATUS_CODE).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -123,7 +124,7 @@ module.exports.changeAvatar = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('Пользователь по указанному id не найден.');
       }
-      return res.status(OK_STATUS_CODE).send({ data: user });
+      res.status(OK_STATUS_CODE).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {

@@ -12,7 +12,7 @@ const BadRequestError = require('../errors/bad-request-error');
 module.exports.getCards = (req, res) => {
   Card.find({})
     .then((card) => res
-      .status(OK_STATUS_CODE).send({ data: card }))
+      .status(OK_STATUS_CODE).send(card))
     .catch(() => res
       .status(SERVER_ERROR_STATUS_CODE)
       .send({ message: 'На сервере произошла ошибка' }));
@@ -23,7 +23,7 @@ module.exports.createCard = (req, res, next) => {
 
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res
-      .status(CREATED_STATUS_CODE).send({ data: card }))
+      .status(CREATED_STATUS_CODE).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные для создания карточки'));
