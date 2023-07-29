@@ -8,6 +8,7 @@ const Card = require('../models/card');
 
 const NotFoundError = require('../errors/not-found-error');
 const BadRequestError = require('../errors/bad-request-error');
+const NotAuthorizedRequestError = require('../errors/not-authorized-request-error');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
@@ -37,12 +38,20 @@ module.exports.createCard = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  Card.findByIdAndRemove(req.params.id)
+  Card.findById(req.params.id)
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Карточка по указанному id не найдена.');
       }
       res.status(OK_STATUS_CODE).send({ data: card });
+    })
+    .then((card) => {
+      if (card.owner === req.user._id) {
+        Card.deleteOne(card).then(() => res.status(OK_STATUS_CODE).send(card));
+      }
+      if (card.owner !== req.user._id) {
+        throw new NotAuthorizedRequestError('Ошибка доступа');
+      }
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
