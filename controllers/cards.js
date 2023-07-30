@@ -48,8 +48,7 @@ module.exports.deleteCard = (req, res, next) => {
     .then((card) => {
       if (String(card.owner) === String(req.user.payload._id)) {
         Card.deleteOne(card).then(() => res.status(OK_STATUS_CODE).send(card));
-      }
-      if (String(card.owner) !== String(req.user.payload._id)) {
+      } else {
         throw new ForbiddenError('Доступ запрещён');
       }
     })
