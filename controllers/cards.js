@@ -46,10 +46,10 @@ module.exports.deleteCard = (req, res, next) => {
       res.status(OK_STATUS_CODE).send({ data: card });
     })
     .then((card) => {
-      if (String(card.owner) === String(req.user._id)) {
+      if (String(card.owner) === String(req.user.payload._id)) {
         Card.deleteOne(card).then(() => res.status(OK_STATUS_CODE).send(card));
       }
-      if (String(card.owner) !== String(req.user._id)) {
+      if (String(card.owner) !== String(req.user.payload._id)) {
         throw new ForbiddenError('Доступ запрещён');
       }
     })
@@ -66,7 +66,11 @@ module.exports.deleteCard = (req, res, next) => {
 };
 
 module.exports.likeCard = (req, res, next) => {
-  Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
+  Card.findByIdAndUpdate(
+    req.params.cardId,
+    { $addToSet: { likes: req.user.payload._id } },
+    { new: true },
+  )
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Карточка по указанному id не найдена.');
@@ -86,7 +90,11 @@ module.exports.likeCard = (req, res, next) => {
 };
 
 module.exports.dislikeCard = (req, res, next) => {
-  Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
+  Card.findByIdAndUpdate(
+    req.params.cardId,
+    { $pull: { likes: req.user.payload_id } },
+    { new: true },
+  )
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Карточка по указанному id не найдена.');
