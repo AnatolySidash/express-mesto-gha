@@ -3,18 +3,20 @@ const { NOT_AUTHORIZED_REQUEST_STATUS_CODE } = require('../utils/errors');
 
 const auth = (req, res, next) => {
   if (!req.cookies) {
-    res.status(NOT_AUTHORIZED_REQUEST_STATUS_CODE).json({ message: 'Нет доступа' });
+    res.status(NOT_AUTHORIZED_REQUEST_STATUS_CODE).json({ message: 'Нет доступа. Нужно авторизоваться!' });
     return;
   }
 
   const token = req.cookies.jwt;
 
-  const result = checkToken(token);
+  const payload = checkToken(token);
 
-  if (!result) {
+  if (!payload) {
     res.status(NOT_AUTHORIZED_REQUEST_STATUS_CODE).json({ message: 'Нет доступа' });
     return;
   }
+
+  req.user = payload;
 
   next();
 };

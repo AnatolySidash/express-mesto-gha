@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+
 const SECRET_KEY = 'super-secret-key';
 
 function generateToken(payload) {
@@ -12,10 +13,9 @@ function checkToken(token) {
 
   try {
     return jwt.verify(token, SECRET_KEY);
-  }
-  catch {
+  } catch (err) {
     return false;
   }
-};
+}
 
 module.exports = { generateToken, checkToken };

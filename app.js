@@ -37,11 +37,6 @@ app.use(errors());
 
 // eslint-disable-next-line
 app.use((err, req, res, next) => {
-  res.status(err.statusCode).send({ message: err.message });
-});
-
-// eslint-disable-next-line
-app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
   res.status(statusCode)
     .send({ message: statusCode === 500 ? 'На сервере произошла ужасная ошибка' : message });
