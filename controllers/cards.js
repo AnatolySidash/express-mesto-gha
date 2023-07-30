@@ -43,22 +43,19 @@ module.exports.deleteCard = (req, res, next) => {
       if (!card) {
         throw new NotFoundError('Карточка по указанному id не найдена.');
       }
-      res.status(OK_STATUS_CODE).send({ data: card });
     })
     .then((card) => {
       if (String(card.owner) === String(req.user.payload._id)) {
-        Card.deleteOne(card).then(() => res.status(OK_STATUS_CODE).send(card));
-      } else {
+        Card.deleteOne(card)
+          .then(() => res.status(OK_STATUS_CODE).send(card));
+      }
+      if (String(card.owner) !== String(req.user.payload._id)) {
         throw new ForbiddenError('Доступ запрещён');
       }
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные карточки'));
-      } else {
-        res.status(SERVER_ERROR_STATUS_CODE).send({
-          message: 'На сервере произошла ошибка',
-        });
       }
       next(err);
     });
@@ -79,12 +76,8 @@ module.exports.likeCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные карточки'));
-      } else {
-        res.status(SERVER_ERROR_STATUS_CODE).send({
-          message: 'На сервере произошла ошибка',
-        });
       }
-      next(err);
+      return next(err);
     });
 };
 
@@ -103,11 +96,7 @@ module.exports.dislikeCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные карточки'));
-      } else {
-        res.status(SERVER_ERROR_STATUS_CODE).send({
-          message: 'На сервере произошла ошибка',
-        });
       }
-      next(err);
+      return next(err);
     });
 };
