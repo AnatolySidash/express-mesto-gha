@@ -80,7 +80,7 @@ module.exports.createUser = (req, res, next) => {
 };
 
 module.exports.getCurrentUser = (req, res, next) => {
-  User.findById(req.user._id)
+  User.findById(req.user.payload._id)
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Пользователь по указанному id не найден.');
@@ -88,6 +88,9 @@ module.exports.getCurrentUser = (req, res, next) => {
       res.status(OK_STATUS_CODE).send({ data: user });
     })
     .catch((err) => {
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
+        next(new BadRequestError('Переданы некорректные данные пользователя'));
+      }
       next(err);
     });
 };
@@ -95,7 +98,7 @@ module.exports.getCurrentUser = (req, res, next) => {
 module.exports.updateUserInfo = (req, res, next) => {
   const { name, about } = req.body;
 
-  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
+  User.findByIdAndUpdate(req.user.payload._id, { name, about }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Пользователь по указанному id не найден.');
@@ -116,7 +119,7 @@ module.exports.updateUserInfo = (req, res, next) => {
 module.exports.changeAvatar = (req, res, next) => {
   const { avatar } = req.body;
 
-  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
+  User.findByIdAndUpdate(req.user.payload._id, { avatar }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Пользователь по указанному id не найден.');
