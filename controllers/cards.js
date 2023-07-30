@@ -38,16 +38,13 @@ module.exports.createCard = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  Card.findById(req.params.id)
+  Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Карточка по указанному id не найдена.');
       }
-    })
-    .then((card) => {
       if (String(card.owner) === String(req.user.payload._id)) {
-        Card.deleteOne(card)
-          .then(() => res.status(OK_STATUS_CODE).send(card));
+        Card.deleteOne(card).then(() => res.status(OK_STATUS_CODE).send(card));
       }
       if (String(card.owner) !== String(req.user.payload._id)) {
         throw new ForbiddenError('Доступ запрещён');
@@ -84,7 +81,7 @@ module.exports.likeCard = (req, res, next) => {
 module.exports.dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
-    { $pull: { likes: req.user.payload_id } },
+    { $pull: { likes: req.user.payload._id } },
     { new: true },
   )
     .then((card) => {
