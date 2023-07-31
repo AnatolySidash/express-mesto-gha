@@ -4,13 +4,11 @@ const { generateToken } = require('../utils/token');
 const {
   OK_STATUS_CODE,
   CREATED_STATUS_CODE,
-  SERVER_ERROR_STATUS_CODE,
 } = require('../utils/errors');
 
 const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-error');
 const BadRequestError = require('../errors/bad-request-error');
-const NotAuthorizedRequestError = require('../errors/not-authorized-request-error');
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
@@ -23,15 +21,16 @@ module.exports.login = (req, res, next) => {
       return res.status(OK_STATUS_CODE).send({ message: 'Авторизация прошла успешно! Доступ разрешён!' });
     })
     .catch((err) => {
-      next(new NotAuthorizedRequestError('Отказ в доступе'));
       next(err);
     });
 };
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((user) => res.status(OK_STATUS_CODE).send({ data: user }))
-    .catch(() => res.status(SERVER_ERROR_STATUS_CODE).send({ message: 'На сервере произошла ошибка' }));
+    .catch((err) => {
+      next(err);
+    });
 };
 
 module.exports.getUserById = (req, res, next) => {
@@ -43,10 +42,11 @@ module.exports.getUserById = (req, res, next) => {
       res.status(OK_STATUS_CODE).send({ data: user });
     })
     .catch((err) => {
-      if (err.name === 'CastError' || err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные пользователя'));
+      } else {
+        next(err);
       }
-      return next(err);
     });
 };
 
@@ -75,11 +75,8 @@ module.exports.createUser = (req, res, next) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные пользователя'));
       } else {
-        res.status(SERVER_ERROR_STATUS_CODE).send({
-          message: 'На сервере произошла ошибка',
-        });
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -92,9 +89,6 @@ module.exports.getCurrentUser = (req, res, next) => {
       res.status(OK_STATUS_CODE).send({ data: user });
     })
     .catch((err) => {
-      if (err.name === 'CastError' || err.name === 'ValidationError') {
-        next(new BadRequestError('Переданы некорректные данные пользователя'));
-      }
       next(err);
     });
 };
@@ -112,11 +106,9 @@ module.exports.updateUserInfo = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные пользователя'));
+      } else {
+        next(err);
       }
-      res.status(SERVER_ERROR_STATUS_CODE).send({
-        message: 'На сервере произошла ошибка',
-      });
-      next(err);
     });
 };
 
@@ -133,10 +125,8 @@ module.exports.changeAvatar = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные пользователя'));
+      } else {
+        next(err);
       }
-      res.status(SERVER_ERROR_STATUS_CODE).send({
-        message: 'На сервере произошла ошибка',
-      });
-      next(err);
     });
 };

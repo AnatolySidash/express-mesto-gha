@@ -9,6 +9,7 @@ const cardRouter = require('./routes/cards');
 const signinRouter = require('./routes/signin');
 const signupRouter = require('./routes/signup');
 const { auth } = require('./middlewares/auth');
+const NotFoundError = require('./errors/not-found-error');
 
 const { PORT = 3000, DB_URL = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
 
@@ -25,8 +26,8 @@ app.use('/cards', auth, cardRouter);
 app.use('/signin', signinRouter);
 app.use('/signup', signupRouter);
 
-app.use('*', (req, res) => {
-  res.status(404).json({ message: 'Страница не найдена' });
+app.use('*', (req, res, next) => {
+  next(new NotFoundError('Страница не найдена'));
 });
 
 mongoose.connect(DB_URL, {
@@ -43,5 +44,6 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
+  // eslint-disable-next-line
   console.log(`Application is running on port ${PORT}`);
 });

@@ -45,16 +45,18 @@ module.exports.deleteCard = (req, res, next) => {
       }
       if (String(card.owner) === String(req.user.payload._id)) {
         Card.deleteOne(card).then(() => res.status(OK_STATUS_CODE).send(card));
+        return;
       }
       if (String(card.owner) !== String(req.user.payload._id)) {
         throw new ForbiddenError('Доступ запрещён');
       }
     })
     .catch((err) => {
-      if (err.name === 'CastError' || err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные карточки'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -71,10 +73,11 @@ module.exports.likeCard = (req, res, next) => {
       res.status(OK_STATUS_CODE).send({ data: card });
     })
     .catch((err) => {
-      if (err.name === 'CastError' || err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные карточки'));
+      } else {
+        next(err);
       }
-      return next(err);
     });
 };
 
@@ -91,9 +94,10 @@ module.exports.dislikeCard = (req, res, next) => {
       res.status(OK_STATUS_CODE).send({ data: card });
     })
     .catch((err) => {
-      if (err.name === 'CastError' || err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные карточки'));
+      } else {
+        next(err);
       }
-      return next(err);
     });
 };
