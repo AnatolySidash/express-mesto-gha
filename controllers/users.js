@@ -9,6 +9,7 @@ const {
 const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-error');
 const BadRequestError = require('../errors/bad-request-error');
+const ConflictRequestError = require('../errors/conflict-request-error');
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
@@ -70,7 +71,8 @@ module.exports.createUser = (req, res, next) => {
     ))
     .catch((err) => {
       if (err.code === 11000) {
-        res.status(409).send({ message: `Пользователь с таким ${email} уже зарегистрирован` });
+        next(new ConflictRequestError(`Пользователь с таким ${email} уже зарегистрирован`));
+        return;
       }
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные пользователя'));
