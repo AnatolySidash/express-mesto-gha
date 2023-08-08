@@ -1,6 +1,7 @@
 const express = require('express');
 const helmet = require('helmet');
 const mongoose = require('mongoose');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
@@ -21,10 +22,15 @@ app.use(bodyParser.json());
 
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(requestLogger);
+
 app.use('/users', auth, userRouter);
 app.use('/cards', auth, cardRouter);
 app.use('/signin', signinRouter);
 app.use('/signup', signupRouter);
+
+app.use(errorLogger);
 
 app.use('*', (req, res, next) => {
   next(new NotFoundError('Страница не найдена'));
